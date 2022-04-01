@@ -1,30 +1,67 @@
 version: 2.1
-jobs:
-  say-hello:
-    docker:
-      - image: cimg/base:stable
+orbs:
+  aws-cli: circleci/aws-cli@2.0.3
+
+commands:
+  print_pipeline_id:
+    parameters:
+      id: 
+        type: string
     steps:
-      - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, Darkness my old friend!"
-  create-aws-infra:
+      - run: echo << parameters.id >>
+
+
+jobs:
+  print_greetings:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - print_pipeline_id:
+          id: << pipeline.id >>
+      - run: echo HELLO
+      - run: echo WORLD
+      - run: echo $_env_name
+
+  upload_file:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - run: echo "THIS IS A SAMPLE TEXT" > ~/output.txt  
+      - persist_to_workspace:
+          root: ~/
+          paths: 
+            - output.txt  
+
+  download_file:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run: cat ~/output.txt 
+
+  create_infrastructure: 
     docker:
       - image: amazon/aws-cli
     steps:
       - checkout
       - run:
-          name: "create aws cloudformation stack"
+          name: Create Cloudformation Stack
           command: |
-                aws cloudformation deploy \
-                  --template-file infra.yml \
-                  --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
-                  --region us-east-1
-
+            aws cloudformation deploy \
+              --template-file template.yml \
+              --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
+              --region us-east-1
 
 
 
 workflows:
-  my-workflow:
+  my_workflow:
     jobs:
-      - create-aws-infra
+      - print_greetings
+      - upload_file
+      - download_file:
+          requires:
+            - upload_file
+      - create_infrastructure
+      
