@@ -1,0 +1,12 @@
+---
+  - name: "install apache2"
+    apt:
+      name: ['apache2']
+      state: latest
+      update_cache: yes
+    
+  - name: "cp apache2 webpage"
+    copy:
+      src: index.html
+      dest: /var/www/html/index.html
+      backup: yes
