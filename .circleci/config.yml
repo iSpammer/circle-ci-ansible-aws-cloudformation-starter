@@ -1,6 +1,5 @@
 version: 2.1
 jobs:
-  
   say-hello:
     docker:
       - image: cimg/base:stable
@@ -9,7 +8,6 @@ jobs:
       - run:
           name: "Say hello"
           command: "echo Hello, Darkness my old friend!"
-
   create-aws-infra:
     docker:
       - image: amazon/aws-cli
@@ -17,7 +15,7 @@ jobs:
       - checkout
       - run:
           name: "create aws cloudformation stack"
-        - command: |
+          command: |
                 aws cloudformation deploy \
                   --template-file infra.yml \
                   --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
