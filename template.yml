@@ -5,7 +5,7 @@ Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName: udacity
+      KeyName: lab
       ImageId: ami-09e67e426f25ce0d7
       InstanceType: t3.micro
       SecurityGroups:
