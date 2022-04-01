@@ -76,6 +76,26 @@ jobs:
           name: Run Playbook and Configure server
           command: |
             ansible-playbook -i inventory.txt main.yml
+  smoke_test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - checkout
+      - run:
+          name: Install Curl
+          command: apk add --update curl
+      - run:
+          name: smoke test (ciggarete cleopatra)
+          command: |
+            URL="https://google.com/"
+            # Test if website exists
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
+
 
 
 
@@ -91,4 +111,6 @@ workflows:
       - configure_infrastructure:
           requires:
             - create_infrastructure
-      
+      - smoke_test:
+          requires:
+            - configure_infrastructure
